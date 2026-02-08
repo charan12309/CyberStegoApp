@@ -8,7 +8,7 @@ Built with Java and Android Studio.
 * **Military-Grade Encryption:** Encrypt text using AES-256 before hiding it.
 * **Shake-to-Delete:** Shake your phone to instantly destroy evidence (clear screen).
 * **Secure Login:** User authentication system with a local "Diary" logging entry/exit times.
-* **Hacker UI:** Custom "Cyberpunk" dark mode interface.
+  
 
 ## 🛠️ How to Run
 1.  Clone this repository.
