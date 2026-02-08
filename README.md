@@ -1,4 +1,4 @@
-# Cyber Stego App 🕵️‍♂️📱
+# Cyber Stego App 🕵️‍♂️
 
 A secure Android application for **Image Steganography** and **AES Encryption**.
 Built with Java and Android Studio.
