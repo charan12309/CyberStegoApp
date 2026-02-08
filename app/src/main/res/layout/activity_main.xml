@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/hacker_black"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="30dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CYBER STEGO"
+        android:textColor="@color/hacker_neon"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.1"
+        android:layout_marginBottom="40dp"/>
+
+    <Button
+        android:id="@+id/btn_goto_encrypt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_neon"
+        android:text="1. Encrypt Message"
+        android:textColor="@color/hacker_black"
+        android:textStyle="bold"
+        android:layout_marginBottom="15dp"/>
+
+    <Button
+        android:id="@+id/btn_goto_embed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_neon"
+        android:text="2. Hide in Image"
+        android:textColor="@color/hacker_black"
+        android:textStyle="bold"
+        android:layout_marginBottom="15dp"/>
+
+    <Button
+        android:id="@+id/btn_goto_extract"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_neon"
+        android:text="3. Extract from Image"
+        android:textColor="@color/hacker_black"
+        android:textStyle="bold"
+        android:layout_marginBottom="15dp"/>
+
+    <Button
+        android:id="@+id/btn_goto_decrypt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_neon"
+        android:text="4. Decrypt Message"
+        android:textColor="@color/hacker_black"
+        android:textStyle="bold"
+        android:layout_marginBottom="25dp"/>
+
+    <Button
+        android:id="@+id/btn_view_logs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_neon"
+        android:text="VIEW ACCESS LOGS"
+        android:textColor="@color/hacker_black"
+        android:textStyle="bold"
+        android:layout_marginBottom="25dp"/>
+
+    <Button
+        android:id="@+id/btn_logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_input_field"
+        android:text="LOGOUT AGENT"
+        android:textColor="#FF0000"
+        android:textStyle="bold"/>
+
+</LinearLayout>

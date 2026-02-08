@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hacker_black">#121212</color>
+    <color name="hacker_dark_grey">#2D2D2D</color>
+    <color name="hacker_neon">#00E5FF</color>
+    <color name="white">#FFFFFF</color>
+</resources>

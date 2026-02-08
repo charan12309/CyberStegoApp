@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/hacker_black"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="30dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NEW AGENT REGISTRATION"
+        android:textColor="@color/hacker_neon"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="40dp"/>
+
+    <EditText
+        android:id="@+id/reg_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_input_field"
+        android:hint="Create Username"
+        android:textColor="@color/white"
+        android:textColorHint="#888888"
+        android:padding="15dp"
+        android:layout_marginBottom="20dp"/>
+
+    <EditText
+        android:id="@+id/reg_pass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_input_field"
+        android:hint="Create Password"
+        android:inputType="textPassword"
+        android:textColor="@color/white"
+        android:textColorHint="#888888"
+        android:padding="15dp"
+        android:layout_marginBottom="20dp"/>
+
+    <EditText
+        android:id="@+id/reg_pass_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_input_field"
+        android:hint="Confirm Password"
+        android:inputType="textPassword"
+        android:textColor="@color/white"
+        android:textColorHint="#888888"
+        android:padding="15dp"
+        android:layout_marginBottom="30dp"/>
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_neon"
+        android:text="REGISTER AGENT"
+        android:textColor="@color/hacker_black"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_go_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Already have an ID? Login"
+        android:textColor="@color/white"
+        android:textStyle="italic"/>
+
+</LinearLayout>
