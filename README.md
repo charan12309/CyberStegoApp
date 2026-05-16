@@ -1,4 +1,4 @@
-# 🔐 StegoApp — Android Image Steganography (Java)
+# 🔐 CyberStegoApp — Android Image Steganography (Java)
 
 > Hide AES‑encrypted text inside images using LSB steganography. Share, save, and extract securely.
 
