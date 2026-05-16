@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">StegoApp</string>
+    <string name="tab_embedding">Embedding</string>
+    <string name="tab_extraction">Extraction</string>
+    <string name="tab_user_info">User info</string>
+    <string name="login">Login</string>
+    <string name="signup">Sign up</string>
+    <string name="logout">Logout</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="select_image">Select Image</string>
+    <string name="save_image">Save Embedded PNG</string>
+    <string name="message">Message</string>
+    <string name="key">Key</string>
+    <string name="decrypt">Decrypt</string>
+    <string name="encrypt">Encrypt and Embed</string>
+    <string name="pick_png_error">Please select a PNG image</string>
+</resources>
