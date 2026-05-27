@@ -165,5 +165,5 @@ No storage permission is required on Android 10+ when picking images via the sys
 
 ---
 
-Built as a concise, fast Android steganography demo using LSB + AES.
+Built as a concise, fast Android steganography demo using LSB + AES encryption.
 
