@@ -18,6 +18,7 @@ import com.example.stegoapp.R;
 import com.example.stegoapp.crypto.CryptoUtils;
 import com.example.stegoapp.databinding.FragmentExtractionBinding;
 import com.example.stegoapp.stego.StegoUtils;
+import com.example.stegoapp.util.ExecutorProvider;
 import com.example.stegoapp.util.ImageUtils;
 
 import javax.crypto.BadPaddingException;
@@ -53,21 +54,29 @@ public class ExtractionFragment extends Fragment {
                 Toast.makeText(requireContext(), "Select a PNG image", Toast.LENGTH_SHORT).show();
                 return;
             }
-            try {
-                byte[] ct = StegoUtils.extractCiphertext(stegoBitmap);
-                String msg = CryptoUtils.decryptAES(ct, key);
-                binding.outputMessage.setText(msg);
-            } catch (Exception e) {
-                binding.outputMessage.setText("");
-                boolean isBadKey = e instanceof BadPaddingException
-                        || e instanceof IllegalBlockSizeException
-                        || (e.getMessage() != null && e.getMessage().toUpperCase().contains("BAD_DECRYPT"));
-                if (isBadKey) {
-                    Toast.makeText(requireContext(), "Incorrect key", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(requireContext(), e.getMessage() != null ? e.getMessage() : "Error", Toast.LENGTH_SHORT).show();
+            // Key derivation (PBKDF2) is deliberately slow, so run crypto off the UI thread.
+            final Bitmap source = stegoBitmap;
+            ExecutorProvider.get().execute(() -> {
+                try {
+                    byte[] ct = StegoUtils.extractCiphertext(source);
+                    String msg = CryptoUtils.decryptAES(ct, key);
+                    if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                        if (binding != null) binding.outputMessage.setText(msg);
+                    });
+                } catch (Exception e) {
+                    // AEADBadTagException (wrong key or tampered image) extends BadPaddingException.
+                    boolean isBadKey = e instanceof BadPaddingException
+                            || e instanceof IllegalBlockSizeException
+                            || (e.getMessage() != null && e.getMessage().toUpperCase().contains("BAD_DECRYPT"));
+                    if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                        if (binding != null) binding.outputMessage.setText("");
+                        Toast.makeText(requireContext(),
+                                isBadKey ? "Incorrect key or modified image"
+                                         : (e.getMessage() != null ? e.getMessage() : "Error"),
+                                Toast.LENGTH_SHORT).show();
+                    });
                 }
-            }
+            });
         });
         return binding.getRoot();
     }

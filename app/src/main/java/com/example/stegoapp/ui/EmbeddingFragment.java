@@ -18,6 +18,7 @@ import com.example.stegoapp.R;
 import com.example.stegoapp.crypto.CryptoUtils;
 import com.example.stegoapp.databinding.FragmentEmbeddingBinding;
 import com.example.stegoapp.stego.StegoUtils;
+import com.example.stegoapp.util.ExecutorProvider;
 import com.example.stegoapp.util.ImageUtils;
 
 public class EmbeddingFragment extends Fragment {
@@ -61,16 +62,25 @@ public class EmbeddingFragment extends Fragment {
                 Toast.makeText(requireContext(), "Enter a message", Toast.LENGTH_SHORT).show();
                 return;
             }
-            try {
-                byte[] ct = CryptoUtils.encryptAES(msg, key);
-                embeddedBitmap = StegoUtils.embedCiphertext(originalBitmap, ct);
-                binding.imagePreview.setImageBitmap(embeddedBitmap);
-                binding.btnSave.setEnabled(true);
-                binding.btnShare.setEnabled(true);
-                Toast.makeText(requireContext(), "Embedded", Toast.LENGTH_SHORT).show();
-            } catch (Exception e) {
-                Toast.makeText(requireContext(), e.getMessage() != null ? e.getMessage() : "Error", Toast.LENGTH_SHORT).show();
-            }
+            // Key derivation (PBKDF2) is deliberately slow, so run crypto off the UI thread.
+            final Bitmap source = originalBitmap;
+            ExecutorProvider.get().execute(() -> {
+                try {
+                    byte[] ct = CryptoUtils.encryptAES(msg, key);
+                    Bitmap out = StegoUtils.embedCiphertext(source, ct);
+                    if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                        if (binding == null) return;
+                        embeddedBitmap = out;
+                        binding.imagePreview.setImageBitmap(out);
+                        binding.btnSave.setEnabled(true);
+                        binding.btnShare.setEnabled(true);
+                        Toast.makeText(requireContext(), "Embedded", Toast.LENGTH_SHORT).show();
+                    });
+                } catch (Exception e) {
+                    if (getActivity() != null) getActivity().runOnUiThread(() ->
+                            Toast.makeText(requireContext(), e.getMessage() != null ? e.getMessage() : "Error", Toast.LENGTH_SHORT).show());
+                }
+            });
         });
         binding.btnSave.setOnClickListener(v -> {
             if (embeddedBitmap == null) return;
