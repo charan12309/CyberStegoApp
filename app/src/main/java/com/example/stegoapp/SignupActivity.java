@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.stegoapp.crypto.PasswordHasher;
 import com.example.stegoapp.data.AppDatabase;
 import com.example.stegoapp.data.User;
 import com.example.stegoapp.data.UserDao;
@@ -27,7 +28,7 @@ public class SignupActivity extends AppCompatActivity {
             String p = binding.inputSignupPassword.getText() != null ? binding.inputSignupPassword.getText().toString() : "";
             ExecutorProvider.get().execute(() -> {
                 try {
-                    dao.insert(new User(u, p));
+                    dao.insert(new User(u, PasswordHasher.hash(p)));
                     runOnUiThread(() -> {
                         Toast.makeText(SignupActivity.this, "Account created", Toast.LENGTH_SHORT).show();
                         finish();

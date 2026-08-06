@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.stegoapp.crypto.PasswordHasher;
 import com.example.stegoapp.data.AppDatabase;
 import com.example.stegoapp.data.User;
 import com.example.stegoapp.data.UserDao;
@@ -31,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
             String p = binding.inputLoginPassword.getText() != null ? binding.inputLoginPassword.getText().toString() : "";
             ExecutorProvider.get().execute(() -> {
                 User user = null; try { user = dao.findByUsername(u); } catch (Exception e) { String m = e.getMessage()!=null?e.getMessage():"Login failed"; runOnUiThread(() -> Toast.makeText(this, m, Toast.LENGTH_SHORT).show()); return; }
-                final boolean result = user != null && p.equals(user.password);
+                final boolean result = user != null && PasswordHasher.verify(p, user.passwordHash);
                 runOnUiThread(() -> {
                     if (result) {
                         session.setLoggedIn(u);

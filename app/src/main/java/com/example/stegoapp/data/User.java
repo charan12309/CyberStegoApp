@@ -9,10 +9,11 @@ public class User {
     @PrimaryKey
     @NonNull
     public String username;
-    public String password;
+    /** PBKDF2 hash of the account password, never the password itself. */
+    public String passwordHash;
 
-    public User(@NonNull String username, String password) {
+    public User(@NonNull String username, String passwordHash) {
         this.username = username;
-        this.password = password;
+        this.passwordHash = passwordHash;
     }
 }

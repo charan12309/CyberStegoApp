@@ -29,16 +29,17 @@ com.example.stegoapp
 ├── ui/
 │   ├── EmbeddingFragment.java   // Pick image → encrypt → center-crop square → embed → save/share
 │   ├── ExtractionFragment.java  // Pick image → center-crop square → extract → decrypt
-│   └── UserInfoFragment.java    // Show username/password, logout, delete account
+│   └── UserInfoFragment.java    // Show username, logout, delete account
 │
-├── crypto/CryptoUtils.java      // AES-128 (ECB/PKCS5Padding), 16-byte normalized key
+├── crypto/CryptoUtils.java      // AES-256-GCM, PBKDF2-derived key, random salt + IV
+├── crypto/PasswordHasher.java   // Salted PBKDF2 hashing + constant-time verify
 ├── stego/StegoUtils.java        // LSB embed/extract, 32-bit length header, center-square
 ├── util/ImageUtils.java         // Software ARGB_8888 decode + PNG save (MediaStore)
 ├── util/ExecutorProvider.java   // Shared single-thread executor for DB work
 │
 ├── data/
 │   ├── AppDatabase.java         // Room database (users table), singleton
-│   ├── User.java                // Room entity: username (PK, non-null), password (plain for demo)
+│   ├── User.java                // Room entity: username (PK, non-null), passwordHash
 │   └── UserDao.java             // DAO: insert/find/deleteByUsername
 │
 └── res/layout/...               // activity_main, fragment_* and auth screens
@@ -58,16 +59,16 @@ MainActivity (Tabs)
   ├─► Embedding
   │     1) Pick image (any format; saved as PNG)
   │     2) Enter message + key
-  │     3) AES encrypt → center-square crop → LSB embed
+  │     3) AES-GCM encrypt → center-square crop → LSB embed
   │     4) Save or Share (document share to avoid recompression)
   │
   ├─► Extraction
   │     1) Pick image (recommend PNG)
-  │     2) Center-square crop → read bits → AES decrypt
+  │     2) Center-square crop → read bits → AES-GCM decrypt (auth tag checked)
   │     3) Show message (errors if image was recompressed)
   │
   └─► User info
-        - View username/password (demo)
+        - View username
         - Logout
         - Delete account (removes current user + logs out)
 ```
@@ -83,7 +84,7 @@ MainActivity (Tabs)
 
 ### Data Format
 ```
-[4 bytes: payload bit length] [N bytes: AES ciphertext]
+[4 bytes: payload bit length] [16 bytes: salt] [12 bytes: IV] [N bytes: ciphertext + 16-byte GCM tag]
 ```
 
 ### Capacity
@@ -97,13 +98,16 @@ MainActivity (Tabs)
 | Property | Value |
 |---|---|
 | Algorithm | AES |
-| Mode | ECB |
-| Padding | PKCS5 |
-| Key Size | 128‑bit (16 bytes) |
-| Key Handling | Input is UTF‑8; padded with zeros or truncated to 16 bytes |
-| IV | None (ECB) |
+| Mode | GCM (authenticated) |
+| Padding | None (stream mode) |
+| Key Size | 256‑bit |
+| Key Derivation | PBKDF2‑HMAC‑SHA1, 120,000 iterations, 16‑byte random salt per message |
+| IV | 12 bytes, random per message |
+| Auth Tag | 128‑bit |
 
-Note: ECB is used for simplicity in this demo. For stronger security, consider AES‑GCM with an IV stored alongside ciphertext (requires changing extraction format).
+The salt and IV are not secret and are prefixed to the ciphertext, so extraction still needs only the passphrase. Because both are random per message, encrypting the same text twice produces different output — there is no ECB‑style pattern leakage. A wrong passphrase or an image that has been modified or recompressed fails the authentication tag and is reported as an error rather than returning garbage.
+
+**Format change:** the payload layout is different from the previous ECB build (it now carries the salt, IV, and GCM tag). Images embedded by an older build hold raw ECB ciphertext and cannot be decrypted by this version — re‑embed any message you need to keep.
 
 ---
 
@@ -111,7 +115,9 @@ Note: ECB is used for simplicity in this demo. For stronger security, consider A
 
 - Room table `users`:
   - `username` (TEXT, PK, non‑null)
-  - `password` (TEXT, demo only — do not use plain text in production)
+  - `passwordHash` (TEXT) — `iterations:saltHex:hashHex` from PBKDF2‑HMAC‑SHA1 (120,000 iterations, 16‑byte random salt). The password itself is never stored, and the profile screen never displays it. Verification is constant‑time.
+
+The schema is at version 3 with `fallbackToDestructiveMigration()`, so upgrading from an older build clears the `users` table — sign up again after updating.
 - Session via `SharedPreferences`:
   - `logged_user` → current username or null
 
@@ -153,14 +159,15 @@ No storage permission is required on Android 10+ when picking images via the sys
 2. Embedding tab → pick image → enter message + key → Embed.  
 3. Save or Share the embedded image.  
 4. Extraction tab → pick the saved/shared image → enter key → Decrypt.  
-5. Message appears if the image wasn’t recompressed.  
+5. Message appears if the image wasn’t recompressed. A wrong key or an altered image is rejected with an authentication error.  
 
 ---
 
 ## ⚠️ Notes
 
 - Use PNG or “document” sharing to avoid recompression. JPEG/WebP may destroy hidden bits.  
-- Passwords are stored in plain text for demo simplicity — do not use in production.  
+- Passwords are stored only as salted PBKDF2 hashes; the app never displays or recovers them.  
+- The encrypted‑payload format changed with the move to AES‑GCM; images embedded by an older build cannot be decrypted by this version.  
 - Center‑square embedding affects output size; the saved embedded image is the cropped square.
 
 ---

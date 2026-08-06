@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import com.example.stegoapp.LoginActivity;
 import com.example.stegoapp.SessionManager;
 import com.example.stegoapp.data.AppDatabase;
-import com.example.stegoapp.data.User;
 import com.example.stegoapp.data.UserDao;
 import com.example.stegoapp.databinding.FragmentUserInfoBinding;
 
@@ -30,12 +29,6 @@ public class UserInfoFragment extends Fragment {
         UserDao dao = AppDatabase.get(requireContext()).userDao();
         String username = session.getLoggedInUser() != null ? session.getLoggedInUser() : "";
         binding.textUsername.setText(username);
-        ExecutorProvider.get().execute(() -> {
-            User user = dao.findByUsername(username);
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> binding.textPassword.setText(user != null ? user.password : ""));
-            }
-        });
         binding.btnLogout.setOnClickListener(v -> {
             session.logout();
             startActivity(new Intent(requireContext(), LoginActivity.class));
